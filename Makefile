@@ -11,4 +11,11 @@ test:
 testv:
 	$(QUIET)python3 test.py -v
 
-.PHONY: all check test testv
+clean:
+	$(QUIET)rm -f *~
+
+distclean: clean
+	$(QUIET)rm -rf __pycache__
+	$(QUIET)rm -rf .mypy_cache
+
+.PHONY: all check test testv clean distclean

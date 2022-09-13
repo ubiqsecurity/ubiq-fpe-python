@@ -69,10 +69,3 @@ class Context:
 
     def ciph(self, buf):
         return self.prf(buf[0:AES_BLOCK_SIZE])
-
-if __name__ == '__main__':
-    ctx = Context(bytes([0]*32), bytes([0]*7), 2**32, 0, 7, 10)
-
-    dst = ctx.prf(bytes([0] * 32))
-    print(len(dst))
-    print(dst)

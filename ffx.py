@@ -17,7 +17,7 @@ class Context:
     def __init__(self,
                  key, twk,
                  maxtxtlen, mintwklen, maxtwklen,
-                 radix, alpha = DEFAULT_ALPHABET):
+                 radix, alpha):
         self.cipher = crypto.ciphers.Cipher(
             crypto.ciphers.algorithms.AES(key),
             crypto.ciphers.modes.CBC(bytes([0]*16)))

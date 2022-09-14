@@ -9,7 +9,10 @@ class Context:
                  key, twk,
                  mintwklen, maxtwklen,
                  radix, alpha = ffx.DEFAULT_ALPHABET):
-        self.ffx = ffx.Context(key, twk, 2**32, mintwklen, maxtwklen, radix)
+        self.ffx = ffx.Context(key, twk,
+                               2**32,
+                               mintwklen, maxtwklen,
+                               radix, alpha)
 
     def cipher(self, X, T, ENC):
         BLKSZ = ffx.AES_BLOCK_SIZE

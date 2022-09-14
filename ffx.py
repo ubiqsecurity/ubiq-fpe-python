@@ -53,7 +53,7 @@ class Context:
 
         self.twk = twk
 
-    def prf(self, buf):
+    def PRF(self, buf):
         if len(buf) % AES_BLOCK_SIZE != 0:
             raise RuntimeError(
                 'Plaintext length must be a multiple of ' +
@@ -71,10 +71,10 @@ class Context:
 
         return dst[0:AES_BLOCK_SIZE]
 
-    def ciph(self, buf):
-        return self.prf(buf[0:AES_BLOCK_SIZE])
+    def Ciph(self, buf):
+        return self.PRF(buf[0:AES_BLOCK_SIZE])
 
-def StringToNumber(s, radix, alpha):
+def StringToNumber(radix, alpha, s):
     p = 1
     n = 0
     for i in range(len(s)):
@@ -83,7 +83,7 @@ def StringToNumber(s, radix, alpha):
         p *= radix
     return n
 
-def NumberToString(n, radix, alpha, l = 1):
+def NumberToString(radix, alpha, n, l = 1):
     s = ''
     while n:
         s = alpha[int(n % radix)] + s

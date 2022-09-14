@@ -38,13 +38,6 @@ class Context:
              len(T) > self.ffx.maxtwklen)):
             raise RuntimeError('Input or tweak length error')
 
-        if ENC:
-            A = X[:u]
-            B = X[u:]
-        else:
-            B = X[:u]
-            A = X[u:]
-
         PQ = [0] * (BLKSZ + int((len(T) + b + 1 + 15) / BLKSZ) * BLKSZ)
 
         # initialize the P portion of PQ
@@ -59,8 +52,10 @@ class Context:
         # initialize the constant portion of Q
         PQ[BLKSZ:BLKSZ + len(T)] = T
 
-        nA = ffx.StringToNumber(A, self.ffx.radix, self.ffx.alpha)
-        nB = ffx.StringToNumber(B, self.ffx.radix, self.ffx.alpha)
+        nA = ffx.StringToNumber(self.ffx.radix, self.ffx.alpha, X[:u])
+        nB = ffx.StringToNumber(self.ffx.radix, self.ffx.alpha, X[u:])
+        if not ENC:
+            nA, nB = nB, nA
 
         mU = self.ffx.radix ** u
         mV = mU
@@ -75,7 +70,7 @@ class Context:
 
             PQ[-b:] = nB.to_bytes(b, byteorder='big')
 
-            R[:BLKSZ] = list(self.ffx.prf(bytes(PQ)))
+            R[:BLKSZ] = list(self.ffx.PRF(bytes(PQ)))
 
             for j in range(int(len(R) / BLKSZ) - 1):
                 w = int.from_bytes(R[12:BLKSZ], byteorder='big')
@@ -84,7 +79,7 @@ class Context:
                 R[12:BLKSZ] = w.to_bytes(4, byteorder='big')
 
                 R[BLKSZ * (j + 1):BLKSZ * (j + 2)] = list(
-                    self.ffx.ciph(bytes(R[:BLKSZ])))
+                    self.ffx.Ciph(bytes(R[:BLKSZ])))
 
                 w ^= j + 1
                 R[12:BLKSZ] = w.to_bytes(4, byteorder='big')
@@ -102,14 +97,11 @@ class Context:
             else:
                 nB = y % mU
 
-        if ENC:
-            Y = (ffx.NumberToString(nA, self.ffx.radix, self.ffx.alpha, u) +
-                 ffx.NumberToString(nB, self.ffx.radix, self.ffx.alpha, v))
-        else:
-            Y = (ffx.NumberToString(nB, self.ffx.radix, self.ffx.alpha, u) +
-                 ffx.NumberToString(nA, self.ffx.radix, self.ffx.alpha, v))
+        if not ENC:
+            nA, nB = nB, nA
 
-        return Y
+        return (ffx.NumberToString(self.ffx.radix, self.ffx.alpha, nA, u) +
+                ffx.NumberToString(self.ffx.radix, self.ffx.alpha, nB, v))
 
     def Encrypt(self, pt, twk = None):
         return self.cipher(pt, twk, True)

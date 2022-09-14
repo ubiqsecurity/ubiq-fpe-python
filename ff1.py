@@ -5,7 +5,10 @@ import math
 import ffx
 
 class Context:
-    def __init__(self, key, twk, mintwklen, maxtwklen, radix):
+    def __init__(self,
+                 key, twk,
+                 mintwklen, maxtwklen,
+                 radix, alpha = ffx.DEFAULT_ALPHABET):
         self.ffx = ffx.Context(key, twk, 2**32, mintwklen, maxtwklen, radix)
 
     def cipher(self, X, T, ENC):
@@ -53,8 +56,8 @@ class Context:
         # initialize the constant portion of Q
         PQ[BLKSZ:BLKSZ + len(T)] = T
 
-        nA = int(A, self.ffx.radix)
-        nB = int(B, self.ffx.radix)
+        nA = ffx.StringToNumber(A, self.ffx.radix, self.ffx.alpha)
+        nB = ffx.StringToNumber(B, self.ffx.radix, self.ffx.alpha)
 
         mU = self.ffx.radix ** u
         mV = mU
@@ -97,11 +100,11 @@ class Context:
                 nB = y % mU
 
         if ENC:
-            Y = (ffx.NumberToString(nA, self.ffx.radix, u) +
-                 ffx.NumberToString(nB, self.ffx.radix, v))
+            Y = (ffx.NumberToString(nA, self.ffx.radix, self.ffx.alpha, u) +
+                 ffx.NumberToString(nB, self.ffx.radix, self.ffx.alpha, v))
         else:
-            Y = (ffx.NumberToString(nB, self.ffx.radix, u) +
-                 ffx.NumberToString(nA, self.ffx.radix, v))
+            Y = (ffx.NumberToString(nB, self.ffx.radix, self.ffx.alpha, u) +
+                 ffx.NumberToString(nA, self.ffx.radix, self.ffx.alpha, v))
 
         return Y
 

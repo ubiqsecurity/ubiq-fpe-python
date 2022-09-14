@@ -11,16 +11,21 @@ import cryptography.hazmat.primitives.ciphers.modes
 AES_BLOCK_SIZE: typing.Final[int] = (int)(
     crypto.ciphers.algorithms.AES.block_size / 8)
 
+DEFAULT_ALPHABET: typing.Final[str] = '0123456789abcdefghijklmnopqrstuvwxyz'
+
 class Context:
     def __init__(self,
                  key, twk,
                  maxtxtlen, mintwklen, maxtwklen,
-                 radix):
+                 radix, alpha = DEFAULT_ALPHABET):
         self.cipher = crypto.ciphers.Cipher(
             crypto.ciphers.algorithms.AES(key),
             crypto.ciphers.modes.CBC(bytes([0]*16)))
 
-        # TODO: add check on radix
+        if radix < 2 or radix > len(alpha):
+            raise RuntimeError('Unsupported radix or incompatible alphabet')
+
+        self.alpha = alpha
 
         #
         # for both ff1 and ff3-1: radix**minlen >= 1000000
@@ -69,16 +74,20 @@ class Context:
     def ciph(self, buf):
         return self.prf(buf[0:AES_BLOCK_SIZE])
 
-def NumberToString(n, radix, l = 1):
-    alpha = [
-        '0', '1', '2', '3', '4', '5', '6', '7', '8',
-        '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-        'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
-        'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-    string = ''
+def StringToNumber(s, radix, alpha):
+    p = 1
+    n = 0
+    for i in range(len(s)):
+        x = alpha.index(s[len(s) - i - 1])
+        n += x * p
+        p *= radix
+    return n
+
+def NumberToString(n, radix, alpha, l = 1):
+    s = ''
     while n:
-        string = alpha[int(n % radix)] + string
+        s = alpha[int(n % radix)] + s
         n //= radix
-    while len(string) < l:
-        string = alpha[0] + string
-    return string
+    while len(s) < l:
+        s = alpha[0] + s
+    return s

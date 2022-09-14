@@ -16,7 +16,7 @@ class Context:
                  key, twk,
                  maxtxtlen, mintwklen, maxtwklen,
                  radix):
-        self._cipher = crypto.ciphers.Cipher(
+        self.cipher = crypto.ciphers.Cipher(
             crypto.ciphers.algorithms.AES(key),
             crypto.ciphers.modes.CBC(bytes([0]*16)))
 
@@ -39,15 +39,14 @@ class Context:
             (maxtwklen > 0 and len(twk) > maxtwklen)):
             raise RuntimeError('Invalid tweak length or bounds')
 
-        self._radix = radix
+        self.radix = radix
 
-        self._mintxtlen = mintxtlen
-        self._maxtxtlen = maxtxtlen
-        self._mintwklen = mintwklen
-        self._maxtxtlen = maxtxtlen
+        self.mintxtlen = mintxtlen
+        self.maxtxtlen = maxtxtlen
+        self.mintwklen = mintwklen
+        self.maxtwklen = maxtwklen
 
-        self._twk = twk
-        return
+        self.twk = twk
 
     def prf(self, buf):
         if len(buf) % AES_BLOCK_SIZE != 0:
@@ -55,7 +54,7 @@ class Context:
                 'Plaintext length must be a multiple of ' +
                 str(AES_BLOCK_SIZE))
 
-        enc = self._cipher.encryptor()
+        enc = self.cipher.encryptor()
 
         dst = bytes([0] * (AES_BLOCK_SIZE * 2 - 1))
         for i in range(int(len(buf) / AES_BLOCK_SIZE)):
@@ -69,3 +68,17 @@ class Context:
 
     def ciph(self, buf):
         return self.prf(buf[0:AES_BLOCK_SIZE])
+
+def NumberToString(n, radix, l = 1):
+    alpha = [
+        '0', '1', '2', '3', '4', '5', '6', '7', '8',
+        '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+        'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+        'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+    string = ''
+    while n:
+        string = alpha[int(n % radix)] + string
+        n //= radix
+    while len(string) < l:
+        string = alpha[0] + string
+    return string

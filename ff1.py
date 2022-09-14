@@ -111,8 +111,8 @@ class Context:
 
         return Y
 
-    def Encrypt(self, pt, twk):
+    def Encrypt(self, pt, twk = None):
         return self.cipher(pt, twk, True)
 
-    def Decrypt(self, ct, twk):
+    def Decrypt(self, ct, twk = None):
         return self.cipher(ct, twk, False)

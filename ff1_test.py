@@ -1,12 +1,8 @@
+#!/usr/bin/env python3
+
 import unittest
 
 import ff1
-import ffx
-
-class TestFFX(unittest.TestCase):
-    def test_context(self):
-        self.assertIsNotNone(
-            ffx.Context(bytes([0]*32), bytes([0]*7), 2**32, 0, 7, 10))
 
 class TestFF1(unittest.TestCase):
     def test_context(self):
@@ -50,6 +46,3 @@ class TestFF1(unittest.TestCase):
             '0123456789abcdefghijklmnopqrstuvwxyz012345',
             'l4zpm8zauhw2zkke9o0i7oi17iojfqog7dmjze3her',
             36)
-
-if __name__ == '__main__':
-    unittest.main()

@@ -39,18 +39,19 @@ class Context:
             B = X[:u]
             A = X[u:]
 
-        P = [1, 2, 1,
-             self.ffx.radix >> 16 & 0xff,
-             self.ffx.radix >> 8 & 0xff,
-             self.ffx.radix & 0xff,
-             10, u & 0xff,
-             0, 0, 0, 0,
-             0, 0, 0, 0]
-        P[-8:-4] = n.to_bytes(4, byteorder='big')
-        P[-4:] = len(T).to_bytes(4, byteorder='big')
+        PQ = [0] * (BLKSZ + int((len(T) + b + 1 + 15) / BLKSZ) * BLKSZ)
 
-        Q = [0] * (int((len(T) + b + 1 + 15) / BLKSZ) * BLKSZ)
-        Q[:len(T)] = T
+        # initialize the P portion of PQ
+        PQ[:8] = [1, 2, 1,
+                  self.ffx.radix >> 16 & 0xff,
+                  self.ffx.radix >> 8 & 0xff,
+                  self.ffx.radix & 0xff,
+                  10, u & 0xff]
+        PQ[8:12] = n.to_bytes(4, byteorder='big')
+        PQ[12:16] = len(T).to_bytes(4, byteorder='big')
+
+        # initialize the constant portion of Q
+        PQ[BLKSZ:BLKSZ + len(T)] = T
 
         nA = int(A, self.ffx.radix)
         nB = int(B, self.ffx.radix)
@@ -62,13 +63,13 @@ class Context:
 
         for i in range(10):
             if ENC:
-                Q[-b - 1] = i
+                PQ[-b - 1] = i
             else:
-                Q[-b - 1] = 9 - i
+                PQ[-b - 1] = 9 - i
 
-            Q[-b:] = nB.to_bytes(b, byteorder='big')
+            PQ[-b:] = nB.to_bytes(b, byteorder='big')
 
-            R[:BLKSZ] = list(self.ffx.prf(bytes(P + Q)))
+            R[:BLKSZ] = list(self.ffx.prf(bytes(PQ)))
 
             for j in range(int(len(R) / BLKSZ) - 1):
                 w = int.from_bytes(R[12:BLKSZ], byteorder='big')

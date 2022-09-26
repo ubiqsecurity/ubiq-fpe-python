@@ -8,9 +8,6 @@ import cryptography.hazmat.primitives.ciphers
 import cryptography.hazmat.primitives.ciphers.algorithms
 import cryptography.hazmat.primitives.ciphers.modes
 
-AES_BLOCK_SIZE: typing.Final[int] = (int)(
-    crypto.ciphers.algorithms.AES.block_size / 8)
-
 DEFAULT_ALPHABET: typing.Final[str] = '0123456789abcdefghijklmnopqrstuvwxyz'
 
 class Context:
@@ -18,6 +15,8 @@ class Context:
                  key, twk,
                  maxtxtlen, mintwklen, maxtwklen,
                  radix, alpha):
+        self.BLKSZ = (int)(crypto.ciphers.algorithms.AES.block_size / 8)
+
         self.cipher = crypto.ciphers.Cipher(
             crypto.ciphers.algorithms.AES(key),
             crypto.ciphers.modes.CBC(bytes([0]*16)))
@@ -54,25 +53,27 @@ class Context:
         self.twk = twk
 
     def PRF(self, buf):
-        if len(buf) % AES_BLOCK_SIZE != 0:
+        BLKSZ = self.BLKSZ
+
+        if len(buf) % BLKSZ != 0:
             raise RuntimeError(
                 'Plaintext length must be a multiple of ' +
-                str(AES_BLOCK_SIZE))
+                str(BLKSZ))
 
         enc = self.cipher.encryptor()
 
-        dst = bytes([0] * (AES_BLOCK_SIZE * 2 - 1))
-        for i in range(int(len(buf) / AES_BLOCK_SIZE)):
+        dst = bytes([0] * (BLKSZ * 2 - 1))
+        for i in range(int(len(buf) / BLKSZ)):
             enc.update_into(
-                buf[i * AES_BLOCK_SIZE:(i + 1) * AES_BLOCK_SIZE],
+                buf[i * BLKSZ:(i + 1) * BLKSZ],
                 dst)
 
         enc.finalize()
 
-        return dst[0:AES_BLOCK_SIZE]
+        return dst[0:BLKSZ]
 
     def Ciph(self, buf):
-        return self.PRF(buf[0:AES_BLOCK_SIZE])
+        return self.PRF(buf[0:self.BLKSZ])
 
 def StringToNumber(radix, alpha, s):
     p = 1

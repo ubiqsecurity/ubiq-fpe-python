@@ -15,7 +15,7 @@ class Context:
                                radix, alpha)
 
     def cipher(self, X, T, ENC):
-        BLKSZ = ffx.AES_BLOCK_SIZE
+        BLKSZ = self.ffx.BLKSZ
 
         n = len(X)
         u = int(n / 2)

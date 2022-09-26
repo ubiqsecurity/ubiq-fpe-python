@@ -75,13 +75,9 @@ class Context:
             for j in range(int(len(R) / BLKSZ) - 1):
                 w = int.from_bytes(R[12:BLKSZ], byteorder='big')
 
-                w ^= j + 1
-                R[12:BLKSZ] = w.to_bytes(4, byteorder='big')
-
+                R[12:BLKSZ] = (w ^ (j + 1)).to_bytes(4, byteorder='big')
                 R[BLKSZ * (j + 1):BLKSZ * (j + 2)] = list(
                     self.ffx.Ciph(bytes(R[:BLKSZ])))
-
-                w ^= j + 1
                 R[12:BLKSZ] = w.to_bytes(4, byteorder='big')
 
             y = int.from_bytes(R[:d], byteorder='big')

@@ -2,7 +2,8 @@
 
 import unittest
 
-import ffx
+import importlib
+ffx = importlib.import_module('ubiq-fpe-python.ffx')
 
 class TestFFX(unittest.TestCase):
     def test_context(self):

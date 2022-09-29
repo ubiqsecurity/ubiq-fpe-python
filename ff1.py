@@ -2,7 +2,7 @@
 
 import math
 
-import ffx
+from . import ffx
 
 class Context:
     def __init__(self,

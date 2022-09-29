@@ -6,10 +6,10 @@ check:
 	$(QUIET)mypy .
 
 test:
-	$(QUIET)python3 -m unittest discover -p '*_test.py'
+	$(QUIET)PYTHONPATH=$$(pwd)/.. python3 -m unittest discover -p '*_test.py'
 
 testv:
-	$(QUIET)python3 -m unittest discover -p '*_test.py' -v
+	$(QUIET)PYTHONPATH=$$(pwd)/.. python3 -m unittest discover -p '*_test.py' -v
 
 clean:
 	$(QUIET)rm -f *~

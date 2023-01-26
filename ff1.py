@@ -24,7 +24,7 @@ class Context:
         b = int((math.ceil(math.log2(self.ffx.radix) * v) + 7) / 8)
         d = 4 * int((b + 3) / 4) + 4
 
-        R = [0] * int((d + (BLKSZ - 1)) / BLKSZ) * BLKSZ
+        R = bytearray([0] * int((d + (BLKSZ - 1)) / BLKSZ) * BLKSZ)
 
         if T == None:
             T = self.ffx.twk
@@ -38,7 +38,8 @@ class Context:
              len(T) > self.ffx.maxtwklen)):
             raise RuntimeError('Input or tweak length error')
 
-        PQ = [0] * (BLKSZ + int((len(T) + b + 1 + 15) / BLKSZ) * BLKSZ)
+        PQ = bytearray(
+            [0] * (BLKSZ + int((len(T) + b + 1 + 15) / BLKSZ) * BLKSZ))
 
         # initialize the P portion of PQ
         PQ[:8] = [1, 2, 1,
@@ -70,14 +71,13 @@ class Context:
 
             PQ[-b:] = nB.to_bytes(b, byteorder='big')
 
-            R[:BLKSZ] = list(self.ffx.PRF(bytes(PQ)))
+            R[:BLKSZ] = self.ffx.PRF(PQ)
 
             for j in range(int(len(R) / BLKSZ) - 1):
                 w = int.from_bytes(R[12:BLKSZ], byteorder='big')
 
                 R[12:BLKSZ] = (w ^ (j + 1)).to_bytes(4, byteorder='big')
-                R[BLKSZ * (j + 1):BLKSZ * (j + 2)] = list(
-                    self.ffx.Ciph(bytes(R[:BLKSZ])))
+                R[BLKSZ * (j + 1):BLKSZ * (j + 2)] = self.ffx.Ciph(R)
                 R[12:BLKSZ] = w.to_bytes(4, byteorder='big')
 
             y = int.from_bytes(R[:d], byteorder='big')

@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
 import math
+import sys
 import typing
 
-import cryptography.hazmat.primitives as crypto
-import cryptography.hazmat.primitives.ciphers
-import cryptography.hazmat.primitives.ciphers.algorithms
-import cryptography.hazmat.primitives.ciphers.modes
+from M2Crypto import EVP
 
 DEFAULT_ALPHABET: typing.Final[str] = '0123456789abcdefghijklmnopqrstuvwxyz'
 
@@ -15,11 +13,19 @@ class Context:
                  key, twk,
                  maxtxtlen, mintwklen, maxtwklen,
                  radix, alpha):
-        self.BLKSZ = (int)(crypto.ciphers.algorithms.AES.block_size / 8)
+        self.BLKSZ = (int)(16)
+        self.key = key
 
-        self.cipher = crypto.ciphers.Cipher(
-            crypto.ciphers.algorithms.AES(key),
-            crypto.ciphers.modes.CBC(bytes([0]*16)))
+        self.alg = None
+        match len(key):
+            case 16:
+                self.alg = 'aes_128_cbc'
+            case 24:
+                self.alg = 'aes_192_cbc'
+            case 32:
+                self.alg = 'aes_256_cbc'
+        if self.alg == None:
+            raise RuntimeError('Key length invalid.')
 
         if radix < 2 or radix > len(alpha):
             raise RuntimeError('Unsupported radix or incompatible alphabet')
@@ -60,17 +66,10 @@ class Context:
                 'Plaintext length must be a multiple of ' +
                 str(BLKSZ))
 
-        enc = self.cipher.encryptor()
+        cipher = EVP.Cipher(alg=self.alg, key=self.key, iv=bytearray(16), op=1)
+        dst = cipher.update(buf)  
 
-        dst = bytes([0] * (BLKSZ * 2 - 1))
-        for i in range(int(len(buf) / BLKSZ)):
-            enc.update_into(
-                buf[i * BLKSZ:(i + 1) * BLKSZ],
-                dst)
-
-        enc.finalize()
-
-        return dst[0:BLKSZ]
+        return dst[-BLKSZ:]
 
     def Ciph(self, buf):
         return self.PRF(buf[0:self.BLKSZ])

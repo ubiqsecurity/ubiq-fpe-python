@@ -3,7 +3,7 @@ QUIET		:= @
 all:
 
 check:
-	$(QUIET)mypy .
+	$(QUIET)mypy ubiq_security_fpe
 
 test:
 	$(QUIET)PYTHONPATH=$$(pwd)/.. python3 -m unittest discover -p '*_test.py'

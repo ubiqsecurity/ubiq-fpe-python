@@ -3,8 +3,8 @@
 import unittest
 
 import importlib
-ff1 = importlib.import_module('ubiq-fpe-python.ff1')
-ffx = importlib.import_module('ubiq-fpe-python.ffx')
+ff1 = importlib.import_module('ubiq_security_fpe.ff1')
+ffx = importlib.import_module('ubiq_security_fpe.ffx')
 
 class TestFF1(unittest.TestCase):
     def test_context(self):

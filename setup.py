@@ -19,7 +19,7 @@ if os.path.isfile(requirementPath):
 
 setuptools.setup(
     name="ubiq-security-fpe",
-    version="1.0.1",
+    version="2.0.0",
     author="Ubiq Security, Inc.",
     author_email="support@ubiqsecurity.com",
     description="Python client library for format preserving encryption",

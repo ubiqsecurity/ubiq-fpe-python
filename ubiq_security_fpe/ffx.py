@@ -17,13 +17,12 @@ class Context:
         self.key = key
 
         self.alg = None
-        match len(key):
-            case 16:
-                self.alg = 'aes_128_cbc'
-            case 24:
-                self.alg = 'aes_192_cbc'
-            case 32:
-                self.alg = 'aes_256_cbc'
+        if len(key) == 16:
+            self.alg = 'aes_128_cbc'
+        elif len(key) == 24:
+            self.alg = 'aes_192_cbc'
+        elif len(key) == 32:
+            self.alg = 'aes_256_cbc'
         if self.alg == None:
             raise RuntimeError('Key length invalid.')
 

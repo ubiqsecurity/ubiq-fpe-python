@@ -11,6 +11,10 @@ os.chdir(here)
 with open(os.path.join(here, "README.md"), "r", encoding="utf-8") as f:
     long_description = f.read()
 
+version_contents = {}
+with open(os.path.join(here, "ubiq_security_fpe", "version.py"), "r", encoding="utf-8") as f:
+    exec(f.read(), version_contents)
+
 requirementPath = os.path.join(here, "requirements.txt")
 install_requires = []
 if os.path.isfile(requirementPath):
@@ -19,7 +23,7 @@ if os.path.isfile(requirementPath):
 
 setuptools.setup(
     name="ubiq-security-fpe",
-    version="2.0.0",
+    version=version_contents["VERSION"],
     author="Ubiq Security, Inc.",
     author_email="support@ubiqsecurity.com",
     description="Python client library for format preserving encryption",

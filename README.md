@@ -1,5 +1,7 @@
 # Format Preserving Encryption in Python
 
+**The Ubiq Structured (Format Preserving Encryption) Library has been merged into the core [Ubiq Python Library](https://gitlab.com/ubiqsecurity/ubiq-python) to improve supportability and maintainability. This package has been deprecated and is no longer supported.**
+
 An implementation of the NIST-approved FF1 algorithm in Python.
 
 This implementation conforms (as best as possible) to
